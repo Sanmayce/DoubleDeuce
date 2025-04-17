@@ -757,7 +757,7 @@ VectorsNeedNonVAriable2:
     
 Let us see who is the fastest 128bit hasher (for 128 bytes long keys, inhere) ...
     
-The package (all sources included) allowing to reproduce all the runs is freely downloadable at:
+The package (all sources included) allowing to reproduce all the runs is freely downloadable at:  
 www.sanmayce.com/Gumbotron_vs_XXH128.zip  
 https://github.com/Sanmayce/DoubleDeuce/releases/download/r1/Gumbotron_vs_XXH128.zip
     
