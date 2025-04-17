@@ -876,4 +876,5 @@ Hashtable: 27bit, i.e. 134,217,728 slots, greater than (107,784,192 bytes), sinc
 | FNV1A_Pippip             |                 135,768,302 |      450,602,801 KEYS-PER-SECOND |
 | SHA3-224                 |                 135,771,905 |          153,841 KEYS-PER-SECOND |
 +--------------------------+-----------------------------+----------------------------------+
+Note: The second column houses the cumulative value for all collisions, the collisions for all orders 4..64 were summed, that is.
 ```
