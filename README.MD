@@ -1,8 +1,6 @@
 To my knowledge, DoubleDeuce is the Fastest 128bit hash for hashing small keys (<1024 bytes).
 It is used in my Zennish MicroDeduplicator Nakamichi 'DoubleDeuce' to hash 16+ bytes long matches down to 16 bytes.
 
-
-
 The following code is the C code written by Kaze (sanmayce@sanmayce.com):
     
 ```
@@ -755,4 +753,127 @@ VectorsNeedNonVAriable1:
 
 VectorsNeedNonVAriable2:
   .ascii "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\000\000\377\377\377\377\377\377\377\377\377\377\377\377\377\377\000\000\000\377\377\377\377\377\377\377\377\377\377\377\377\377\000\000\000\000\377\377\377\377\377\377\377\377\377\377\377\377\000\000\000\000\000\377\377\377\377\377\377\377\377\377\377\377\000\000\000\000\000\000\377\377\377\377\377\377\377\377\377\377\000\000\000\000\000\000\000\377\377\377\377\377\377\377\377\377\000\000\000\000\000\000\000\000\377\377\377\377\377\377\377\377\000\000\000\000\000\000\000\000\000\377\377\377\377\377\377\377\000\000\000\000\000\000\000\000\000\000\377\377\377\377\377\377\000\000\000\000\000\000\000\000\000\000\000\377\377\377\377\377\000\000\000\000\000\000\000\000\000\000\000\000\377\377\377\377\000\000\000\000\000\000\000\000\000\000\000\000\000\377\377\377\000\000\000\000\000\000\000\000\000\000\000\000\000\000\377\377\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\377"
+```
+
+Collision testing:
+    
+Testset: "A billion Knight-Tours variants (each KT with 256 variants, the KT itself omitted) - each 128 bytes long"
+Testfile: 1000000000.KnightTours.txt (130,000,000,000 bytes)
+    
+The name of the game - hashing all lines and taking either 5 bytes or 6,7,8 bytes from the hash.
+    
+```
++------------------------+----------------------------------------------------------+
+| Hasher                 |                          Collisions within first 5 bytes |
++------------------------+----------------------------------------------------------+
+| XXH3_64bits v0.8.0     | 1,000,000,000 - 999,545,727 distinct lines =     454,273 |
+| DoubleDeuceAES_128bits | 1,000,000,000 - 999,545,796 distinct lines =     454,204 |
++------------------------+----------------------------------------------------------+
+
++------------------------+----------------------------------------------------------+
+| Hasher                 |                          Collisions within first 6 bytes |
++------------------------+----------------------------------------------------------+
+| XXH3_64bits v0.8.0     | 1,000,000,000 - 999,998,214 distinct lines =       1,786 |
+| DoubleDeuceAES_128bits | 1,000,000,000 - 999,998,213 distinct lines =       1,787 |
++------------------------+----------------------------------------------------------+
+
++------------------------+----------------------------------------------------------+
+| Hasher                 |                          Collisions within first 7 bytes |
++------------------------+----------------------------------------------------------+
+| XXH3_64bits v0.8.0     | 1,000,000,000 - 999,999,989 distinct lines =          11 |
+| DoubleDeuceAES_128bits | 1,000,000,000 - 999,999,994 distinct lines =           6 |
++------------------------+----------------------------------------------------------+
+
++------------------------+----------------------------------------------------------+
+| Hasher                 |                          Collisions within first 8 bytes |
++------------------------+----------------------------------------------------------+
+| XXH3_64bits v0.8.0     | 1,000,000,000 - 1,000,000,000 distinct lines =         0 |
+| DoubleDeuceAES_128bits | 1,000,000,000 - 1,000,000,000 distinct lines =         0 |
++------------------------+----------------------------------------------------------+
+```
+    
+This is how the console looks like:
+    
+```
+C:\test\COLLISION_Hashliner>GENERATE_Xmillion_Knight-Tours.bat 1000000000
+Generating 1000000000 Knight-Tours and dumping them into file ...
+
+C:\test\COLLISION_Hashliner>Knight-Tour_FNV1A_YoshimitsuTRIADii_vs_CRC32_TRISMUS.exe a8 1000000000  1>1000000000.KnightTours.txt
+
+C:\test\COLLISION_Hashliner>bench7.bat 1000000000.KnightTours.txt
+
+C:\test\COLLISION_Hashliner>Hashliner_XXH3_dump7byteshash.exe 1000000000.KnightTours.txt  1>1000000000.KnightTours.txt.xxh3.txt
+
+C:\test\COLLISION_Hashliner>Hashliner_DDAES_dump7byteshash.exe 1000000000.KnightTours.txt  1>1000000000.KnightTours.txt.DDAES.txt
+
+C:\test\COLLISION_Hashliner>Sandokan_QuickSortExternal_Deduplicated_4+GB_64bit_Intel.exe 1000000000.KnightTours.txt.xxh3.txt /fast /descend 3000
+Sandokan_QuickSortExternal_4+GB r.3+, written by Kaze, using Bill Durango's Quicksort source.
+Size of input file: 16,000,000,000
+Counting lines ...
+Lines encountered: 1,000,000,000
+Longest line (including CR if present): 15
+Allocated memory for pointers-to-lines in MB: 7629
+Assigning pointers ...
+sizeof(int), sizeof(void*): 4, 8
+Trying to allocate memory for the file itself in MB: 15258 ... OK! Get on with fast internal accesses.
+Uploading ...
+Sorting 1,000,000,000 Pointers ...
+Quicksort (Insertionsort for small blocks) commenced ...
+/ RightEnd: 000,328,304,267; NumberOfSplittings: 0,114,284,204; Done: 100% ...
+NumberOfComparisons: 34,310,536,510
+The time to sort 1,000,000,000 items via Quicksort+Insertionsort was 2,848,402 clocks.
+Performance: 12,045,534 Comparisons_128B_long-Per-Second i.e 24,091,068 RandomReads_128B_long-Per-Second.
+Dumping the sorted data (Regime=2)...
+\ Done 100% ...
+Dumped 1,000,000,000 lines.
+OK! Incoming and resultant file's sizes match.
+Dumping the sorted data [deduplicated] ...
+Dumped 999,999,989 distinct lines.
+Dump time: 460,940 clocks.
+Total time: 3,347,265 clocks.
+Performance: 4,780 bytes/clock.
+Done successfully.
+
+C:\test\COLLISION_Hashliner>sort /R QuickSortExternal_4+GB.distinct.txt  1>1000000000.KnightTours.txt.xxh3.7bytes.2orABOVE.txt
+
+C:\test\COLLISION_Hashliner>dir *7b*
+
+15-Aug-21  12:28               156 1000000000.KnightTours.txt.DDAES.7bytes.2orABOVE.txt
+15-Aug-21  11:32               286 1000000000.KnightTours.txt.xxh3.7bytes.2orABOVE.txt
+
+C:\test\COLLISION_Hashliner>type 1000000000.KnightTours.txt.xxh3.7bytes.2orABOVE.txt
+0,000,002       f84627e722e85e
+0,000,002       f0039d0c4e4fce
+0,000,002       c87c64d97df0e7
+0,000,002       bb4344a5546572
+0,000,002       af2f628f4b3ffb
+0,000,002       a8cb8675c94610
+0,000,002       a742cf83948622
+0,000,002       657cb9dff2d962
+0,000,002       436aef7ab54ce7
+0,000,002       270fcde0563670
+0,000,002       0b533d70915c51
+
+C:\test\COLLISION_Hashliner>
+```
+Collision and Speed testing:    
+    
+```
+Testfile: TERAPIG_Encyclopaedia_Judaica_(in_22_volumes)_TXT.tar (107,784,192 bytes)
+Testmachine: Laptop 'Brutalitto' AMD 4800H max turbo 4.3GHz, 64GB DDR4 3200MHz, Windows 10
+Hashtable: 27bit, i.e. 134,217,728 slots, greater than (107,784,192 bytes), since in case of perfect hasher - slots should be more than the keys at each position
++--------------------------+-----------------------------+----------------------------------+
+| Hasher,                  | Number Of Hash Collisions = | RAW Hashing Speed (in one pass,  |
+| GCC-10.1 compiler        | Distinct Keys -             | at each position) for keys       |
+| -O3 -mavx                | Number Of Trees             | 4,6,8,10,12,14,16,18,36,64 bytes |
++--------------------------+-----------------------------+----------------------------------+
+| DoubleDeuceAES_Gumbotron |                 135,752,271 |      204,640,573 KEYS-PER-SECOND |
+| HighwayHash128 (generic) |                 135,754,873 |        6,336,146 KEYS-PER-SECOND |
+| XXH3_128bits v0.8.0      |                 135,756,978 |      212,843,977 KEYS-PER-SECOND |
+| wyhash final             |                 135,762,454 |      442,100,861 KEYS-PER-SECOND |
+| XXH3_64bits v0.8.0       |                 135,763,366 |      290,994,033 KEYS-PER-SECOND |
+| CRC32C (_mm_crc32_u32)   |                 135,764,628 |      252,599,460 KEYS-PER-SECOND |
+| FNV1A_Pippip             |                 135,768,302 |      450,602,801 KEYS-PER-SECOND |
+| SHA3-224                 |                 135,771,905 |          153,841 KEYS-PER-SECOND |
++--------------------------+-----------------------------+----------------------------------+
 ```
