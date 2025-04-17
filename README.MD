@@ -878,3 +878,52 @@ Hashtable: 27bit, i.e. 134,217,728 slots, greater than (107,784,192 bytes), sinc
 +--------------------------+-----------------------------+----------------------------------+
 Note: The second column houses the cumulative value for all collisions, the collisions for all orders 4..64 were summed, that is.
 ```
+Excellent speed for a lookupper! Considering the hash is 128bit, sometimes (in the future) 32bit won’t suffice!
+The mini-main cycle (for keys 1..63 bytes long), delivering 200+ million key/s hash speed on Zen 2 Renoir 4800H max turbo 4.3GHz, DDR4 3200MHz.
+The main usage, though, is in the 64+ range, where the speed is greater:
+```
+// Okay, the AVX2 mainloop (the handler of multiples of 64 bytes) code is only 40 instructions (icc 19.0.0 -O3 -mavx2):
+// https://godbolt.org/z/oaW3zGcv5 
+/*
+        vmovdqu   ymm10, YMMWORD PTR [rdi]                      #94.43
+        dec       rax                                           #89.9
+        vmovdqu   ymm11, YMMWORD PTR [32+rdi]                   #95.43
+        vpshufb   ymm8, ymm10, ymm0                             #101.12
+        vpshufb   ymm7, ymm11, ymm0                             #100.12
+        vpunpcklbw ymm9, ymm10, ymm11                           #191.12
+        vpunpckhbw ymm12, ymm10, ymm11                          #192.12
+        vmovdqu   YMMWORD PTR [64+rsp], ymm9                    #191.4
+        vmovdqu   YMMWORD PTR [96+rsp], ymm12                   #192.4
+        vpermq    ymm14, ymm7, 78                               #104.9
+        add       rsi, -64                                      #494.22
+        vpermq    ymm15, ymm8, 78                               #105.9
+        vpunpcklbw ymm13, ymm14, ymm15                          #253.12
+        vpunpckhbw ymm7, ymm14, ymm15                           #254.12
+        vmovdqu   YMMWORD PTR [rsp], ymm14                      #104.1
+        vmovdqu   YMMWORD PTR [32+rsp], ymm15                   #105.1
+        vmovdqu   YMMWORD PTR [128+rsp], ymm13                  #253.4
+        vmovdqu   YMMWORD PTR [160+rsp], ymm7                   #254.4
+        vaesenc   xmm1, xmm1, XMMWORD PTR [rdi]                 #452.12
+        vaesenc   xmm3, xmm3, XMMWORD PTR [rsp]                 #454.13
+        vaesenc   xmm4, xmm4, XMMWORD PTR [64+rsp]              #457.12
+        vaesenc   xmm3, xmm3, XMMWORD PTR [16+rsp]              #464.13
+        vaesenc   xmm1, xmm1, XMMWORD PTR [16+rdi]              #462.12
+        vaesenc   xmm7, xmm1, XMMWORD PTR [32+rdi]              #472.12
+        vaesenc   xmm6, xmm6, XMMWORD PTR [128+rsp]             #459.12
+        vaesenc   xmm4, xmm4, XMMWORD PTR [96+rsp]              #467.12
+        vaesenc   xmm8, xmm3, XMMWORD PTR [32+rsp]              #474.13
+        vaesenc   xmm6, xmm6, XMMWORD PTR [160+rsp]             #469.12
+        vaesenc   xmm9, xmm4, XMMWORD PTR [80+rsp]              #477.12
+        vaesenc   xmm3, xmm8, XMMWORD PTR [48+rsp]              #484.13
+        vaesenc   xmm11, xmm7, XMMWORD PTR [48+rdi]             #482.12
+        add       rdi, 64                                       #89.19
+        vaesenc   xmm10, xmm6, XMMWORD PTR [144+rsp]            #479.12
+        vaesenc   xmm4, xmm9, XMMWORD PTR [112+rsp]             #487.12
+        vaesenc   xmm12, xmm11, xmm3                            #491.12
+        vaesenc   xmm6, xmm10, XMMWORD PTR [176+rsp]            #489.12
+        vaesenc   xmm13, xmm12, xmm4                            #492.12
+        vaesenc   xmm1, xmm13, xmm6                             #493.12
+        cmp       rax, -1                                       #89.9
+        jne       ..B2.4        # Prob 82%                      #89.9
+*/
+```
