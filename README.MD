@@ -757,7 +757,7 @@ VectorsNeedNonVAriable2:
 
 Collision testing:
     
-Testset: "A billion Knight-Tours variants (each KT with 256 variants, the KT itself omitted) - each 128 bytes long"
+Testset: "A billion Knight-Tours variants (each KT with 256 variants, the KT itself omitted) - each 128 bytes long"  
 Testfile: 1000000000.KnightTours.txt (130,000,000,000 bytes)
     
 The name of the game - hashing all lines and taking either 5 bytes or 6,7,8 bytes from the hash.
