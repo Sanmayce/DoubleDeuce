@@ -754,7 +754,125 @@ VectorsNeedNonVAriable1:
 VectorsNeedNonVAriable2:
   .ascii "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377\000\000\377\377\377\377\377\377\377\377\377\377\377\377\377\377\000\000\000\377\377\377\377\377\377\377\377\377\377\377\377\377\000\000\000\000\377\377\377\377\377\377\377\377\377\377\377\377\000\000\000\000\000\377\377\377\377\377\377\377\377\377\377\377\000\000\000\000\000\000\377\377\377\377\377\377\377\377\377\377\000\000\000\000\000\000\000\377\377\377\377\377\377\377\377\377\000\000\000\000\000\000\000\000\377\377\377\377\377\377\377\377\000\000\000\000\000\000\000\000\000\377\377\377\377\377\377\377\000\000\000\000\000\000\000\000\000\000\377\377\377\377\377\377\000\000\000\000\000\000\000\000\000\000\000\377\377\377\377\377\000\000\000\000\000\000\000\000\000\000\000\000\377\377\377\377\000\000\000\000\000\000\000\000\000\000\000\000\000\377\377\377\000\000\000\000\000\000\000\000\000\000\000\000\000\000\377\377\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\377"
 ```
+    
+Let us see who is the fastest 128bit hasher (for 128 bytes long keys, inhere) ...
+    
+The package (all sources included) allowing to reproduce all the runs is freely downloadable at:
+www.sanmayce.com/Gumbotron_vs_XXH128.zip
+https://github.com/Sanmayce/DoubleDeuce/releases/download/r1/Gumbotron_vs_XXH128.zip
+    
+The 200M keys were chosen in order to fit into 32GB machines, something like 25GB needed.
+    
+On laptop 'Compressionette' (Kaby Lake i5-7200U 2.5GHz (3.1GHz max turbo) 36GB DDR4 2133MHz, Windows 10) Gumbotron_YMM hashes 4,487/3,160= 1.41x faster than XXH128:
+```
+G:\Lookupperorama_r13\COLLISION_Hashliner>GvsXXH.bat
 
+G:\Lookupperorama_r13\COLLISION_Hashliner>if exist 200000000.KnightTours.txt goto Skip
+
+G:\Lookupperorama_r13\COLLISION_Hashliner>BenchHashingLines_Gumbotron.exe 200000000.KnightTours.txt
+Hashing 200,000,000 lines/keys, 128 bytes each, in RAM ...
+The first key has hash:
+f4b027e3ab
+Total time: 4,907 clocks.
+Total time: 3,186 clocks.
+Total time: 3,162 clocks.
+Total time: 3,160 clocks.
+Total time: 3,185 clocks.
+Total time: 3,174 clocks.
+Total time: 3,160 clocks.
+Total time: 3,164 clocks.
+Total time: 3,167 clocks.
+Total time: 3,174 clocks.
+Total time: 3,183 clocks.
+Total time: 3,174 clocks.
+Total time: 3,165 clocks.
+Total time: 3,172 clocks.
+Total time: 3,161 clocks.
+Total time: 3,170 clocks.
+Total time: 3,165 clocks.
+Total time (BEST RUN): 3,160 clocks.
+
+G:\Lookupperorama_r13\COLLISION_Hashliner>BenchHashingLines_XXH128.exe 200000000.KnightTours.txt
+Hashing 200,000,000 lines/keys, 128 bytes each, in RAM ...
+The first key has hash:
+c703b0bd77
+Total time: 6,021 clocks.
+Total time: 4,492 clocks.
+Total time: 4,532 clocks.
+Total time: 4,509 clocks.
+Total time: 4,492 clocks.
+Total time: 4,490 clocks.
+Total time: 4,495 clocks.
+Total time: 4,494 clocks.
+Total time: 4,492 clocks.
+Total time: 4,491 clocks.
+Total time: 4,496 clocks.
+Total time: 4,487 clocks.
+Total time: 4,491 clocks.
+Total time: 4,493 clocks.
+Total time: 4,496 clocks.
+Total time: 4,494 clocks.
+Total time: 4,512 clocks.
+Total time (BEST RUN): 4,487 clocks.
+
+G:\Lookupperorama_r13\COLLISION_Hashliner>
+```
+    
+On laptop 'Brutalitto' (Renoir AMD 4800H max turbo 4.3GHz, 64GB DDR4 3200MHz, Windows 10) Gumbotron_YMM hashes 3,266/2,484= 1.31x faster than XXH128:
+```
+D:\Lookupperorama_r13\COLLISION_Hashliner>GvsXXH.bat
+
+D:\Lookupperorama_r13\COLLISION_Hashliner>if exist 200000000.KnightTours.txt goto Skip
+
+D:\Lookupperorama_r13\COLLISION_Hashliner>BenchHashingLines_Gumbotron.exe 200000000.KnightTours.txt
+Hashing 200,000,000 lines/keys, 128 bytes each, in RAM ...
+The first key has hash:
+f4b027e3ab
+Total time: 3,313 clocks.
+Total time: 2,485 clocks.
+Total time: 2,500 clocks.
+Total time: 2,484 clocks.
+Total time: 2,501 clocks.
+Total time: 2,500 clocks.
+Total time: 2,500 clocks.
+Total time: 2,500 clocks.
+Total time: 2,500 clocks.
+Total time: 2,500 clocks.
+Total time: 2,485 clocks.
+Total time: 2,500 clocks.
+Total time: 2,500 clocks.
+Total time: 2,516 clocks.
+Total time: 2,500 clocks.
+Total time: 2,485 clocks.
+Total time: 2,500 clocks.
+Total time (BEST RUN): 2,484 clocks.
+
+D:\Lookupperorama_r13\COLLISION_Hashliner>BenchHashingLines_XXH128.exe 200000000.KnightTours.txt
+Hashing 200,000,000 lines/keys, 128 bytes each, in RAM ...
+The first key has hash:
+c703b0bd77
+Total time: 4,204 clocks.
+Total time: 3,359 clocks.
+Total time: 3,360 clocks.
+Total time: 3,360 clocks.
+Total time: 3,359 clocks.
+Total time: 3,360 clocks.
+Total time: 3,360 clocks.
+Total time: 3,359 clocks.
+Total time: 3,375 clocks.
+Total time: 3,266 clocks.
+Total time: 3,349 clocks.
+Total time: 3,360 clocks.
+Total time: 3,375 clocks.
+Total time: 3,360 clocks.
+Total time: 3,390 clocks.
+Total time: 3,376 clocks.
+Total time: 3,375 clocks.
+Total time (BEST RUN): 3,266 clocks.
+
+D:\Lookupperorama_r13\COLLISION_Hashliner>
+```
+    
 Collision testing:
     
 Testset: "A billion Knight-Tours variants (each KT with 256 variants, the KT itself omitted) - each 128 bytes long"  
