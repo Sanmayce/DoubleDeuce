@@ -1,8 +1,8 @@
 To my knowledge, DoubleDeuce is the Fastest 128bit hash for hashing small keys (<1024 bytes).
 It is used in my Zennish MicroDeduplicator Nakamichi 'DoubleDeuce' to hash 16+ bytes long matches down to 16 bytes.
-
+    
 ![Gumbotron_darker](https://github.com/Sanmayce/Nakamichi/assets/14062548/fb63af7b-1c25-4116-9ff4-11d6a8007a24)
-
+    
 The following code is the C code written by Kaze (sanmayce@sanmayce.com):
     
 ```
