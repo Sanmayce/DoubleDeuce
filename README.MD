@@ -1,4 +1,5 @@
-To my knowledge, DoubleDeuce is the Fastest 128bit hash for hashing small keys (<1024 bytes).
+To my knowledge, DoubleDeuce was the Fastest 128bit hash for hashing small keys (<1024 bytes).
+The a5hash128 5.14 by Aleksey Vaneev outperformed my 128 bit hasher, it led to *crafting the FASTEST "Non-Quality" hasher under Heaven - Pippip_AES*.
 It is used in my Zennish MicroDeduplicator Nakamichi 'DoubleDeuce' to hash 16+ bytes long matches down to 16 bytes.
     
 ![Gumbotron_darker](https://github.com/Sanmayce/Nakamichi/assets/14062548/fb63af7b-1c25-4116-9ff4-11d6a8007a24)
